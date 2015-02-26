@@ -1,7 +1,9 @@
 require "net/https"
+require "json"
 
 class Source
     def initialize(tarball_path, app, api_key)
+        puts "Acquiring source URL..."
         @api_key = api_key
         url = URI.parse("https://#{api_key}@api.heroku.com/apps/#{app}/sources")
 
@@ -12,6 +14,8 @@ class Source
         res = Net::HTTP.start(url.host, url.port, nil, nil, nil, nil, {use_ssl: true}) {|http|
           http.request(req)
         }
-        puts res.body
+
+        @urls = JSON.parse(res.body)
+        puts "Source URL is #{@urls['source_blob']['put_url']}"
     end
 end
