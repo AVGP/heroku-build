@@ -38,5 +38,10 @@ $ heroku build --app ./deploy-me.tgz "$(git rev-parse HEAD)"
 ```
 which will use the current git commit hash as the version to be displayed on the "Activity" panel on heroku.com.
 
+## Contributing
+
+Found a bug or have an improvement or new feature in mind? Awesome!
+Just go for it with either a pull request or an issue - also check out [the Contributing.md file](https://github.com/AVGP/heroku-build/blob/master/CONTRIBUTING.md)
+
 ## License
 MIT License.
