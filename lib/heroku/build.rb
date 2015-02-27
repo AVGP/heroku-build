@@ -13,10 +13,11 @@ class Heroku::Command::Build < Heroku::Command::BaseWithApp
       return
     end
 
-    display "Building #{app} #{version} from #{tarball_path}"
+    display "Building #{app} version #{version} from #{tarball_path}"
     source = Source.new(app, Heroku::Auth.password)
     tarball_url = source.upload(tarball_path)
-    make_build_from_url(tarball_url, version)
+    build_id = make_build_from_url(tarball_url, version)
+    puts "Check build status at https://dashboard.heroku.com/apps/#{app}/activity/builds/#{build_id}"
   end
 
   def src
@@ -38,8 +39,10 @@ class Heroku::Command::Build < Heroku::Command::BaseWithApp
       http.request(req)
     }
 
-    puts res.body
-    puts "Build created."
 
+    build_id = JSON.parse(res.body)[:id]
+
+    puts "Created Build ID #{build_id}"
+    build_id
   end
 end
