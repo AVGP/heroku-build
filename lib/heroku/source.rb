@@ -1,11 +1,15 @@
 require "net/https"
 require "json"
 
+#
+# Talks to the /sources API endpoint
+# to create two URLs to deal with the source tarball
+# 1.) PUT URL to upload the tarball
+# 2.) GET URL to use for creating a build
 class Source
-    def initialize(app, api_key)
+    def initialize(app_name, api_key)
         puts "Acquiring source URL..."
-        @api_key = api_key
-        url = URI.parse("https://#{api_key}@api.heroku.com/apps/#{app}/sources")
+        url = URI.parse("https://#{api_key}@api.heroku.com/apps/#{app_name}/sources")
 
         req = Net::HTTP::Post.new(url.request_uri)
         req.add_field("Accept", "application/vnd.heroku+json; version=3")
@@ -18,9 +22,7 @@ class Source
         @urls = JSON.parse(res.body)
 
         if @urls['source_blob'].nil?
-            puts "Error! Source URL was not returned from Heroku!"
-            puts res.body
-            return
+            raise "Error! Source URL was not returned from Heroku! Response: #{res.body}"
         end
 
         @urls = @urls['source_blob']
