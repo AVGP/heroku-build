@@ -40,6 +40,3 @@ which will use the current git commit hash as the version to be displayed on the
 
 ## License
 MIT License.
-
-## License
-MIT License.
