@@ -4,16 +4,18 @@ require "json"
 
 require_relative 'source'
 
+PLUGIN_VERSION="1.0.0"
+
 class Heroku::Command::Build < Heroku::Command::BaseWithApp
   def index
     tarball_path = args.shift
     version = args.shift
     if tarball_path.nil? || version.nil?
-      display "Usage: heroku build <path/to/tarball> <version>"
+      display "Heroku build v#{PLUGIN_VERSION}\nUsage: heroku build <path/to/tarball> <version>"
       return
     end
 
-    display "Building #{app} version #{version} from #{tarball_path}"
+    display "Heroku build v#{PLUGIN_VERSION}\nBuilding #{app} version #{version} from #{tarball_path}"
     source = Source.new(app, Heroku::Auth.password)
     tarball_url = source.upload(tarball_path)
     build_id = make_build_from_url(tarball_url, version)
@@ -39,8 +41,7 @@ class Heroku::Command::Build < Heroku::Command::BaseWithApp
       http.request(req)
     }
 
-
-    build_id = JSON.parse(res.body)[:id]
+    build_id = JSON.parse(res.body)["id"]
 
     puts "Created Build ID #{build_id}"
     build_id
