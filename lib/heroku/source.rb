@@ -16,6 +16,11 @@ class Source
         req.add_field("Authorization", "Bearer #{api_key}")
 
         res = Net::HTTP.start(url.host, url.port, nil, nil, nil, nil, {use_ssl: true}) {|http|
+          # See https://github.com/heroku/heroku/issues/477 for the reason of this...
+          if !ENV['HEROKU_SSL_VERIFY'].nil? && ENV['HEROKU_SSL_VERIFY'].downcase == 'disable'
+            http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+          end
+
             http.request(req)
         }
 
@@ -41,6 +46,11 @@ class Source
         req.add_field("Content-Length", File.size(tarball_path))
 
         res = Net::HTTP.start(url.host, url.port, nil, nil, nil, nil, {use_ssl: true}) {|http|
+            # See https://github.com/heroku/heroku/issues/477 for the reason of this...
+            if !ENV['HEROKU_SSL_VERIFY'].nil? && ENV['HEROKU_SSL_VERIFY'].downcase == 'disable'
+              http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+            end
+
             http.request(req)
         }
 

@@ -4,7 +4,7 @@ require "json"
 
 require_relative 'source'
 
-PLUGIN_VERSION="1.0.1"
+PLUGIN_VERSION="1.0.2"
 
 class Heroku::Command::Build < Heroku::Command::BaseWithApp
   def index
@@ -15,11 +15,6 @@ class Heroku::Command::Build < Heroku::Command::BaseWithApp
     if tarball_path.nil? || version.nil?
       display "Heroku build v#{PLUGIN_VERSION}\nUsage: heroku build <path/to/tarball> <version>"
       return
-    end
-
-    # See https://github.com/heroku/heroku/issues/477 for the reason of this...
-    if ENV['HEROKU_SSL_VERIFY'].downcase == 'disable'
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
     display "Heroku build v#{PLUGIN_VERSION}\nBuilding #{app} version #{version} from #{tarball_path}"
@@ -45,6 +40,11 @@ class Heroku::Command::Build < Heroku::Command::BaseWithApp
     req.body = "#{ { source_blob: { url: tar_url, version: version}}.to_json }"
 
     res = Net::HTTP.start(url.host, url.port, nil, nil, nil, nil, {use_ssl: true}) {|http|
+      # See https://github.com/heroku/heroku/issues/477 for the reason of this...
+      if !ENV['HEROKU_SSL_VERIFY'].nil? && ENV['HEROKU_SSL_VERIFY'].downcase == 'disable'
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+
       http.request(req)
     }
 
