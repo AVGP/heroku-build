@@ -4,15 +4,22 @@ require "json"
 
 require_relative 'source'
 
-PLUGIN_VERSION="1.0.0"
+PLUGIN_VERSION="1.0.1"
 
 class Heroku::Command::Build < Heroku::Command::BaseWithApp
   def index
     tarball_path = args.shift
     version = args.shift
+
+    # Not all params present? Show usage, exit.
     if tarball_path.nil? || version.nil?
       display "Heroku build v#{PLUGIN_VERSION}\nUsage: heroku build <path/to/tarball> <version>"
       return
+    end
+
+    # See https://github.com/heroku/heroku/issues/477 for the reason of this...
+    if ENV['HEROKU_SSL_VERIFY'].downcase == 'disable'
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
     display "Heroku build v#{PLUGIN_VERSION}\nBuilding #{app} version #{version} from #{tarball_path}"
